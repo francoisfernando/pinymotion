@@ -181,7 +181,7 @@ class MotionRecorder(threading.Thread):
 
 	def __enter__(self):
 		self.start_camera()
-		threading.Thread(name="blink", target=self.blink, daemon=True).start()
+		#threading.Thread(name="blink", target=self.blink, daemon=True).start()
 		threading.Thread(name="annotate", target=self.annotate_with_datetime, args=(self._camera,), daemon=True).start()
 		if self.overlay: threading.Thread(name="motion overlay", target=self.motion_overlay, daemon=True).start()
 		logging.info("now ready to detect motion")
@@ -260,7 +260,7 @@ class MotionRecorder(threading.Thread):
 			# wait for motion detection
 			if self._motion.wait(self.prebuffer):
 				if self._motion.motion():
-					self._camera.led = True
+					#self._camera.led = True
 					try:
 						# start a new video, then append circular buffer to it until
 						# motion ends
@@ -278,7 +278,7 @@ class MotionRecorder(threading.Thread):
 						# also store a JPEG of the current view
 						self.capture_jpeg()
 						self._output = None
-						self._camera.led = False
+						#self._camera.led = False
 						self.captures.put(name)
 					# wait for the circular buffer to fill up before looping again
 					self.wait(self.prebuffer / 2)
@@ -304,9 +304,9 @@ class MotionRecorder(threading.Thread):
 		"""
 		while self._camera.recording:
 			if not self._motion.motion() and self._output is None:
-				self._camera.led = True
+				#self._camera.led = True
 				self.wait(0.05) # this is enough for a quick blink
-				self._camera.led = False
+				#self._camera.led = False
 			self.wait(2-time.time()%2) # wait up to two seconds
 
 	def annotate_with_datetime(self,camera):
