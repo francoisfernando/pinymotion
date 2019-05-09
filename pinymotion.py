@@ -314,7 +314,7 @@ class MotionRecorder(threading.Thread):
 		"""Background thread for annotating date and time to video.
 		"""
 		while camera.recording:
-			camera.annotate_text = time.strftime("%y-%m-%d %H:%M") + " " + str(self)
+			camera.annotate_text = datetime.now().strftime("%y-%m-%d %H:%M") + " " + str(self)
 			camera.annotate_background = True
 			self.wait(60-time.gmtime().tm_sec) # wait to beginning of minute
 
