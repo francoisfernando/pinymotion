@@ -42,7 +42,7 @@ class MotionVectorReader(picamera.array.PiMotionAnalysis):
 	def __str__(self):
 		return "sensitivity {0}/{1}".format(self.area, self.frames)
 
-	def __init__(self, camera, window=10, area = 25, frames = 4):
+	def __init__(self, camera, window=10, area = 15, frames = 4):
 		"""Initialize motion vector reader
 
 		Parameters
