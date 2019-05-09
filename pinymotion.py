@@ -10,6 +10,7 @@ import picamera.array
 import numpy as np
 from scipy import ndimage
 import time
+from datetime import datetime
 import threading
 import queue
 import signal
@@ -264,7 +265,7 @@ class MotionRecorder(threading.Thread):
 					try:
 						# start a new video, then append circular buffer to it until
 						# motion ends
-						name = time.strftime(self.file_pattern)
+						name = datetime.now().strftime(self.file_pattern)
 						output = io.open(name, 'wb')
 						self.append_buffer(output,header=True)
 						while self._motion.motion() and self._camera.recording:
