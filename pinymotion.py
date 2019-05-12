@@ -361,7 +361,7 @@ class MotionRecorder(threading.Thread):
 def capture():
 	logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)-8s %(message)s')
 	try:
-		with MotionRecorder(overlay=True) as mr:
+		with MotionRecorder(overlay=False) as mr:
 			mr.start()
 			while True:
 				recording = mr.captures.get()
