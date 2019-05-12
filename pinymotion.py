@@ -172,8 +172,8 @@ class MotionRecorder(threading.Thread):
 	prebuffer = 10 # number of seconds to keep in buffer
 	postbuffer = 5 # number of seconds to record post end of motion
 	overlay = False
-	dir_pattern = '%y-%m-%d'
-	file_pattern = '%y-%m-%dT%H-%M-%S.h264' # filename pattern for time.strfime
+	dir_pattern = '%Y-%m-%d'
+	file_pattern = '%Y-%m-%dT%H-%M-%S.h264' # filename pattern for time.strfime
 	_area = 12 # number of connected MV blocks (each 16x16 pixels) to count as a moving object
 	_frames = 4 # number of frames which must contain movement to trigger
 
