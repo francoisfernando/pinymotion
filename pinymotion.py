@@ -172,8 +172,9 @@ class MotionRecorder(threading.Thread):
 	prebuffer = 10 # number of seconds to keep in buffer
 	postbuffer = 5 # number of seconds to record post end of motion
 	overlay = False
+	dir_pattern = '%y-%m-%d'
 	file_pattern = '%y-%m-%dT%H-%M-%S.h264' # filename pattern for time.strfime
-	_area = 25 # number of connected MV blocks (each 16x16 pixels) to count as a moving object
+	_area = 12 # number of connected MV blocks (each 16x16 pixels) to count as a moving object
 	_frames = 4 # number of frames which must contain movement to trigger
 
 	_camera = None
@@ -249,6 +250,17 @@ class MotionRecorder(threading.Thread):
 		camera = self._camera
 		camera.capture('/dev/shm/picamera.jpg', use_video_port=True, format='jpeg', quality=80)
 
+	def clip_filename(self):
+		now = datetime.now()
+		dir_name = now.strftime(self.dir_pattern)
+		file_name = now.strftime(self.file_pattern)
+
+		# check if dir exists
+		if not os.path.isdir(dir_name):
+			os.mkdir(dir_name)
+		
+		return os.path.join(dir_name, file_name)
+
 	def run(self):
 		"""Main loop of the motion recorder. Waits for trigger from the motion detector
 		async task and writes in-memory circular buffer to file every time it happens,
@@ -265,7 +277,7 @@ class MotionRecorder(threading.Thread):
 					try:
 						# start a new video, then append circular buffer to it until
 						# motion ends
-						name = datetime.now().strftime(self.file_pattern)
+						name = self.clip_filename()
 						output = io.open(name, 'wb')
 						self.append_buffer(output,header=True)
 						while self._motion.motion() and self._camera.recording:
@@ -349,7 +361,7 @@ class MotionRecorder(threading.Thread):
 def capture():
 	logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)-8s %(message)s')
 	try:
-		with MotionRecorder() as mr:
+		with MotionRecorder(overlay=True) as mr:
 			mr.start()
 			while True:
 				recording = mr.captures.get()
