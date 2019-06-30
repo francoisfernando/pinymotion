@@ -358,15 +358,65 @@ class MotionRecorder(threading.Thread):
 			self.wait(0.5) # limit the preview framerate to max 2 fps
 		self._camera.remove_overlay(overlay)
 
+
+class GracefulStopSignal:
+  stop_now = False
+
+  def __init__(self):
+    # signal.signal(signal.SIGINT, self.stop_gracefully)
+    signal.signal(signal.SIGTERM, self.stop_gracefully)
+
+  def stop_gracefully(self, signum, frame):
+    self.stop_now = True
+
+
+def time_in_range(start, end, x):
+    """Return true if x is in the range [start, end]"""
+    if start <= end:
+        return start <= x <= end
+    else:
+        return start <= x or x <= end
+
+
+def is_scheduled():
+	from datetime import time
+
+	start_time = time(6, 0, 0)
+	end_time = time(18, 0, 0)
+	time_now = datetime.now().time()
+
+	return time_in_range(start_time, end_time, time_now)
+
+
 def capture():
 	logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)-8s %(message)s')
+
+	stop_signal = GracefulStopSignal()
+
+	if is_scheduled() is False:
+		logging.info("stopping motion recording, schedule ended")
+		exit()
+
 	try:
 		with MotionRecorder(overlay=False) as mr:
 			mr.start()
+
 			while True:
+				if stop_signal.stop_now is True:
+					logging.info("stopping motion recording, stop signal received")
+					break
+
 				recording = mr.captures.get()
 				logging.info("motion capture in '{0}'".format(recording))
 				mr.captures.task_done()
+				
+				if is_scheduled() is False:
+					logging.info("stopping motion recording, schedule ended")
+					break
+
+			mr.stop()
+
+		exit()
 	except (KeyboardInterrupt, SystemExit):
 		exit()
 
