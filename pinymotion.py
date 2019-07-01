@@ -414,8 +414,6 @@ def capture():
 					logging.info("stopping motion recording, schedule ended")
 					break
 
-			mr.stop()
-
 		exit()
 	except (KeyboardInterrupt, SystemExit):
 		exit()
